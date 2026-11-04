@@ -1,36 +1,36 @@
 package com.example.simblocker
 
-import android.Manifest
-import android.os.Bundle
-import android.widget.Button
-import android.widget.Switch
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import android.net.Uri
+import android.provider.ContactsContract
+import android.telecom.Call
+import android.telecom.CallScreeningService
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val switchBlocker = findViewById<Switch>(R.id.switchBlocker)
-        val btnPermissions = findViewById<Button>(R.id.btnPermissions)
-
-        btnPermissions.setOnClickListener {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.READ_PHONE_STATE),
-                101
-            )
-            Toast.makeText(this, "Permisos solicitados. Asegúrate de dar acceso.", Toast.LENGTH_LONG).show()
+class MyCallScreeningService : CallScreeningService() {
+    override fun onScreenCall(callDetails: Call.Details) {
+        if (callDetails.callDirection != Call.Details.DIRECTION_INCOMING) {
+            respondToCall(callDetails, CallResponse.Builder().build())
+            return
         }
 
-        switchBlocker.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                Toast.makeText(this, "Filtro de SIM activado", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Filtro desactivado", Toast.LENGTH_SHORT).show()
-            }
+        val phoneNumber = callDetails.handle?.schemeSpecificPart
+        val isContact = phoneNumber?.let { isNumberInContacts(it) } ?: false
+
+        val response = CallResponse.Builder()
+        if (!isContact) {
+            response.setRejectCall(true)
+                .setSkipCallLog(false)
+                .setSkipNotification(true)
         }
+
+        respondToCall(callDetails, response.build())
+    }
+
+    private fun isNumberInContacts(phoneNumber: String): Boolean {
+        val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber))
+        val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
+        contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+            return cursor.moveToFirst()
+        }
+        return false
     }
 }
