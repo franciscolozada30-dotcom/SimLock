@@ -1,7 +1,9 @@
 package com.example.simblocker
 
 import android.Manifest
+import android.app.role.RoleManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.SubscriptionManager
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnPermissions.setOnClickListener {
+            // 1. Solicitar permisos de contactos y estado
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -50,7 +53,17 @@ class MainActivity : AppCompatActivity() {
                 ),
                 101
             )
-            Toast.makeText(this, "Solicitando permisos...", Toast.LENGTH_SHORT).show()
+
+            // 2. Solicitar el rol oficial de sistema para filtrar llamadas
+            val roleManager = getSystemService(Context.ROLE_SERVICE) as RoleManager
+            if (roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
+                if (!roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
+                    val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
+                    startActivityForResult(intent, 102)
+                }
+            }
+
+            Toast.makeText(this, "Solicitando permisos y rol...", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -70,7 +83,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         } catch (e: Exception) {
-            // Protección contra errores en eSIMs
+            // Omitir errores de eSIM
         }
     }
 }
+
