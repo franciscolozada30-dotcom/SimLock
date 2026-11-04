@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var switchSim1: Switch
     private lateinit var switchSim2: Switch
 
@@ -55,6 +56,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            val subscriptionManager
-            
+        try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                val subscriptionManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as? SubscriptionManager
+                val subInfoList = subscriptionManager?.activeSubscriptionInfoList
+                if (!subInfoList.isNullOrEmpty()) {
+                    if (subInfoList.size > 0 && subInfoList[0]?.displayName != null) {
+                        switchSim1.text = "Bloquear: ${subInfoList[0].displayName}"
+                    }
+                    if (subInfoList.size > 1 && subInfoList[1]?.displayName != null) {
+                        switchSim2.text = "Bloquear: ${subInfoList[1].displayName}"
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Protección contra errores en eSIMs
+        }
+    }
+}
