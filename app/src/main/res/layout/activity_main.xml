@@ -4,36 +4,55 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center">
+    android:gravity="center_horizontal">
 
+    <!-- 📱 Título -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SIM Blocker"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="16dp"/>
 
+    <!-- 📝 Descripción -->
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bloquea llamadas de números desconocidos que no estén en tus contactos."
-        android:textAlignment="center"
         android:textSize="14sp"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="24dp"
+        android:gravity="center"/>
 
+    <!-- ⚙️ Interruptor General -->
     <Switch
         android:id="@+id/switchBlocker"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Activar Bloqueo Automático"
-        android:textSize="16sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- 📶 Interruptor SIM 1 -->
+    <Switch
+        android:id="@+id/switchSim1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bloquear llamadas de SIM 1"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- 📶 Interruptor SIM 2 -->
+    <Switch
+        android:id="@+id/switchSim2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bloquear llamadas de SIM 2"
         android:layout_marginBottom="24dp"/>
 
+    <!-- 🔑 Botón de Permisos -->
     <Button
         android:id="@+id/btnPermissions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Conceder Permisos y Configuración"/>
+        android:text="CONCEDER PERMISOS Y CONFIGURACIÓN"/>
 
 </LinearLayout>
