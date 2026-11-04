@@ -2,7 +2,9 @@ package com.example.simblocker
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.telephony.SubscriptionManager
 import android.widget.Button
 import android.widget.Switch
 import android.widget.Toast
@@ -10,13 +12,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var switchSim1: Switch
+    private lateinit var switchSim2: Switch
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val switchBlocker = findViewById<Switch>(R.id.switchBlocker)
-        val switchSim1 = findViewById<Switch>(R.id.switchSim1)
-        val switchSim2 = findViewById<Switch>(R.id.switchSim2)
+        switchSim1 = findViewById<Switch>(R.id.switchSim1)
+        switchSim2 = findViewById<Switch>(R.id.switchSim2)
         val btnPermissions = findViewById<Button>(R.id.btnPermissions)
 
         val prefs = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
@@ -27,11 +32,9 @@ class MainActivity : AppCompatActivity() {
         switchBlocker.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("blocking_active", isChecked).apply()
         }
-
         switchSim1.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("block_sim_1", isChecked).apply()
         }
-
         switchSim2.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("block_sim_2", isChecked).apply()
         }
@@ -49,4 +52,9 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Solicitando permisos...", Toast.LENGTH_SHORT).show()
         }
     }
-}
+
+    override fun onResume() {
+        super.onResume()
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            val subscriptionManager
+            
