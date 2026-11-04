@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SIM Blocker"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bloquea llamadas de números desconocidos que no estén en tus contactos."
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:layout_marginBottom="32dp"/>
+
+    <Switch
+        android:id="@+id/switchBlocker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activar Bloqueo Automático"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btnPermissions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Conceder Permisos y Configuración"/>
+
+</LinearLayout>
