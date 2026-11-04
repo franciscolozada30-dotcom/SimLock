@@ -21,7 +21,6 @@ class MyCallScreeningService : CallScreeningService() {
             return
         }
 
-        // Identificar la SIM (cuenta de llamadas)
         val accountHandle = callDetails.accountHandle
         val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
         val accounts = try {
@@ -46,9 +45,12 @@ class MyCallScreeningService : CallScreeningService() {
 
         val response = CallResponse.Builder()
         if (shouldCheckSim && !isContact) {
-            response.setRejectCall(true)
-                .setSkipCallLog(false)
+            // Se agregó setDisallowCall(true) para que Android acepte el bloqueo sin errores
+            response.setDisallowCall(true)
+                .setRejectCall(true)
                 .setSkipNotification(true)
+        } else {
+            response.setDisallowCall(false)
         }
 
         respondToCall(callDetails, response.build())
