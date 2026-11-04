@@ -1,9 +1,11 @@
 package com.example.simblocker
 
+import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import android.telecom.Call
 import android.telecom.CallScreeningService
+import android.telecom.TelecomManager
 
 class MyCallScreeningService : CallScreeningService() {
     override fun onScreenCall(callDetails: Call.Details) {
@@ -12,11 +14,38 @@ class MyCallScreeningService : CallScreeningService() {
             return
         }
 
+        val prefs = getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+        val blockingActive = prefs.getBoolean("blocking_active", true)
+        if (!blockingActive) {
+            respondToCall(callDetails, CallResponse.Builder().build())
+            return
+        }
+
+        // Identificar la SIM (cuenta de llamadas)
+        val accountHandle = callDetails.accountHandle
+        val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+        val accounts = try {
+            telecomManager.callCapablePhoneAccounts
+        } catch (e: SecurityException) {
+            emptyList()
+        }
+
+        var isSim1 = true
+        if (accounts.size >= 2 && accountHandle != null) {
+            if (accountHandle == accounts[1]) {
+                isSim1 = false
+            }
+        }
+
+        val blockSim1 = prefs.getBoolean("block_sim_1", true)
+        val blockSim2 = prefs.getBoolean("block_sim_2", true)
+        val shouldCheckSim = (isSim1 && blockSim1) || (!isSim1 && blockSim2)
+
         val phoneNumber = callDetails.handle?.schemeSpecificPart
         val isContact = phoneNumber?.let { isNumberInContacts(it) } ?: false
 
         val response = CallResponse.Builder()
-        if (!isContact) {
+        if (shouldCheckSim && !isContact) {
             response.setRejectCall(true)
                 .setSkipCallLog(false)
                 .setSkipNotification(true)
