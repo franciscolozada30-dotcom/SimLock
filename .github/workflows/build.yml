@@ -4,7 +4,9 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Clonar repositorio por bash
+        run: |
+          git clone https://github.com/${{ github.repository }}.git .
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
