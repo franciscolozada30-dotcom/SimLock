@@ -2,33 +2,34 @@ name: Build APK
 on: [push]
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # 1. Descarga tu código
+      - name: Descargar codigo (Checkout)
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+      # 2. Configura Java 17 (Requerido para Android)
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      # 3. Configura Gradle (Instala la versión correcta automáticamente sin wrappers)
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 7.5
 
-      - name: Install Gradle 7.5
+      # 4. Compila el APK usando el Gradle que acabamos de instalar
+      - name: Compilar APK (Build APK)
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
         run: |
-          wget -q https://services.gradle.org/distributions/gradle-7.5-bin.zip
-          unzip -q gradle-7.5-bin.zip
-          sudo mv gradle-7.5 /opt/gradle
-          echo "/opt/gradle/bin" >> $GITHUB_PATH
+          gradle assembleDebug --stacktrace
 
-      - name: Generate Wrapper and Build APK
-        run: |
-          gradle wrapper --gradle-version 7.5
-          chmod +x gradlew
-          ./gradlew assembleDebug
-
-      - name: Upload APK Artifact
+      # 5. Sube el APK listo para que lo descargues
+      - name: Subir APK (Upload Artifact)
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
